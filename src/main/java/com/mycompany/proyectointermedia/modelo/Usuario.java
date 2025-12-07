@@ -7,6 +7,8 @@ public class Usuario {
     String celular;
     int id_cargo; // Para relacionarlo con la tabla Cargo
     String nombre_cargo; // Auxiliar para mostrar el nombre del cargo en la tabla
+    String correo;
+    String password;
 
     public Usuario() {
     }
@@ -19,7 +21,8 @@ public class Usuario {
         this.id_cargo = id_cargo;
     }
 
-    // Getters y Setters
+    // --- GETTERS Y SETTERS ---
+    
     public int getId() {
         return id;
     }
@@ -66,5 +69,23 @@ public class Usuario {
 
     public void setNombre_cargo(String nombre_cargo) {
         this.nombre_cargo = nombre_cargo;
+    }
+
+    // --- NUEVOS GETTERS Y SETTERS PARA CORREO Y PASSWORD ---
+    
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

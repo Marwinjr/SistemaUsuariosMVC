@@ -12,15 +12,14 @@
         <div class="container mt-5">
             <div class="col-md-6 offset-md-3">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header bg-primary text-white">
                         <h3>Datos del Usuario</h3>
                     </div>
                     <div class="card-body">
                         
                         <%
-                            // Verificamos si estamos editando (trae datos) o creando (viene vacío)
                             Usuario user = (Usuario) request.getAttribute("usuario");
-                            if(user == null) user = new Usuario(); // Si es nuevo, creamos objeto vacío para que no de error
+                            if(user == null) user = new Usuario(); 
                         %>
 
                         <form action="UsuarioController" method="POST">
@@ -37,6 +36,16 @@
                             </div>
                             
                             <div class="form-group">
+                                <label>Correo:</label>
+                                <input type="email" name="correo" value="<%= user.getCorreo() != null ? user.getCorreo() : "" %>" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Contraseña:</label>
+                                <input type="text" name="password" value="<%= user.getPassword() != null ? user.getPassword() : "" %>" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
                                 <label>Celular:</label>
                                 <input type="text" name="celular" value="<%= user.getCelular() != null ? user.getCelular() : "" %>" class="form-control" required>
                             </div>
@@ -48,7 +57,6 @@
                                         List<Cargo> cargos = (List<Cargo>) request.getAttribute("cargos");
                                         if(cargos != null) {
                                             for(Cargo c : cargos) {
-                                                // Código para dejar seleccionado el cargo que ya tenía el usuario (si editamos)
                                                 String selected = (c.getId() == user.getId_cargo()) ? "selected" : "";
                                     %>
                                         <option value="<%= c.getId() %>" <%= selected %>> <%= c.getNombre() %> </option>

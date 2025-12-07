@@ -7,10 +7,12 @@ import com.mycompany.proyectointermedia.modelo.Usuario;
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@WebServlet(name = "UsuarioController", urlPatterns = {"/UsuarioController"})
 public class UsuarioController extends HttpServlet {
 
     UsuarioDAO dao = new UsuarioDAO();
@@ -20,10 +22,7 @@ public class UsuarioController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Recibimos la acción que viene del botón (ej: "listar", "guardar", "eliminar")
         String accion = request.getParameter("accion");
-        
-        // Rutas de las vistas
         String acceso = ""; 
         
         if (accion != null) {
@@ -35,25 +34,28 @@ public class UsuarioController extends HttpServlet {
                     break;
                     
                 case "nuevo":
-                    // Cargamos los cargos para el ComboBox antes de ir al formulario
                     List<Cargo> listaCargos = cargoDao.listar();
                     request.setAttribute("cargos", listaCargos);
                     acceso = "usuario_form.jsp";
                     break;
                     
                 case "Guardar":
+                    // Recibimos TODOS los datos, incluyendo los nuevos
                     String nom = request.getParameter("nombre");
                     String ape = request.getParameter("apellido");
+                    String cor = request.getParameter("correo");      // <--- NUEVO
+                    String pass = request.getParameter("password");   // <--- NUEVO
                     String cel = request.getParameter("celular");
-                    int idCargo = Integer.parseInt(request.getParameter("cboCargo")); // El valor del Select
+                    int idCargo = Integer.parseInt(request.getParameter("cboCargo"));
                     
                     u.setNombre(nom);
                     u.setApellido(ape);
+                    u.setCorreo(cor);      // <--- NUEVO
+                    u.setPassword(pass);   // <--- NUEVO
                     u.setCelular(cel);
                     u.setId_cargo(idCargo);
-                    dao.add(u);
                     
-                    // Volvemos a listar
+                    dao.add(u); // Ahora sí envía todo completo
                     acceso = "UsuarioController?accion=listar";
                     break;
                     
@@ -63,7 +65,6 @@ public class UsuarioController extends HttpServlet {
                     Usuario usu = dao.list(id);
                     request.setAttribute("usuario", usu);
                     
-                    // También necesitamos los cargos para el select
                     List<Cargo> listaCargosEdit = cargoDao.listar();
                     request.setAttribute("cargos", listaCargosEdit);
                     
@@ -74,15 +75,20 @@ public class UsuarioController extends HttpServlet {
                     int idUser = Integer.parseInt(request.getParameter("id"));
                     String nomU = request.getParameter("nombre");
                     String apeU = request.getParameter("apellido");
+                    String corU = request.getParameter("correo");     // <--- NUEVO
+                    String passU = request.getParameter("password");  // <--- NUEVO
                     String celU = request.getParameter("celular");
                     int idCargoU = Integer.parseInt(request.getParameter("cboCargo"));
                     
                     u.setId(idUser);
                     u.setNombre(nomU);
                     u.setApellido(apeU);
+                    u.setCorreo(corU);     // <--- NUEVO
+                    u.setPassword(passU);  // <--- NUEVO
                     u.setCelular(celU);
                     u.setId_cargo(idCargoU);
-                    dao.edit(u);
+                    
+                    dao.edit(u); // Envía todo actualizado
                     acceso = "UsuarioController?accion=listar";
                     break;
                     
@@ -93,8 +99,6 @@ public class UsuarioController extends HttpServlet {
                     break;
             }
         }
-        
-        // Redireccionamos a la página que corresponda
         request.getRequestDispatcher(acceso).forward(request, response);
     }
 

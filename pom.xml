@@ -17,6 +17,11 @@
     </properties>
     
     <dependencies>
+        <dependency>
+    <groupId>jstl</groupId>
+    <artifactId>jstl</artifactId>
+    <version>1.2</version>
+</dependency>
         <!-- 1. Dependencia para aplicaciones Web (Jakarta EE 8) -->
         <dependency>
             <groupId>jakarta.platform</groupId>

@@ -15,11 +15,35 @@ public class UsuarioDAO {
     ResultSet rs;
     Usuario u = new Usuario();
 
-    // METODO PARA LISTAR (Mostrar en tabla)
+    // --- NUEVO METODO PARA EL LOGIN ---
+    public Usuario validar(String correo, String password) {
+        Usuario us = new Usuario();
+        String sql = "SELECT * FROM usuarios WHERE correo=? AND password=?";
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setString(1, correo);
+            ps.setString(2, password);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                us.setId(rs.getInt("id_usuario"));
+                us.setNombre(rs.getString("nombre"));
+                us.setApellido(rs.getString("apellido"));
+                us.setCorreo(rs.getString("correo"));
+                us.setCelular(rs.getString("celular"));
+                us.setId_cargo(rs.getInt("id_cargo"));
+            }
+        } catch (Exception e) {
+            System.err.println("Error al validar: " + e);
+        }
+        return us;
+    }
+
+    // METODO PARA LISTAR (Actualizado con correo)
     public List listar() {
         ArrayList<Usuario> list = new ArrayList<>();
-        // Hacemos un JOIN para traer también el nombre del cargo
-        String sql = "SELECT u.id_usuario, u.nombre, u.apellido, u.celular, u.id_cargo, c.nombre_cargo " +
+        // Agregamos u.correo a la consulta
+        String sql = "SELECT u.id_usuario, u.nombre, u.apellido, u.celular, u.correo, u.id_cargo, c.nombre_cargo " +
                      "FROM usuarios u INNER JOIN cargos c ON u.id_cargo = c.id_cargo";
         try {
             con = cn.getConnection();
@@ -31,8 +55,9 @@ public class UsuarioDAO {
                 us.setNombre(rs.getString("nombre"));
                 us.setApellido(rs.getString("apellido"));
                 us.setCelular(rs.getString("celular"));
+                us.setCorreo(rs.getString("correo")); // Traemos el correo
                 us.setId_cargo(rs.getInt("id_cargo"));
-                us.setNombre_cargo(rs.getString("nombre_cargo")); // Para mostrar el nombre del cargo
+                us.setNombre_cargo(rs.getString("nombre_cargo")); 
                 list.add(us);
             }
         } catch (Exception e) {
@@ -41,7 +66,7 @@ public class UsuarioDAO {
         return list;
     }
 
-    // METODO PARA OBTENER UN SOLO USUARIO (Para Editar)
+    // METODO PARA OBTENER UN SOLO USUARIO (Actualizado para editar)
     public Usuario list(int id) {
         String sql = "SELECT * FROM usuarios WHERE id_usuario=" + id;
         try {
@@ -53,6 +78,8 @@ public class UsuarioDAO {
                 u.setNombre(rs.getString("nombre"));
                 u.setApellido(rs.getString("apellido"));
                 u.setCelular(rs.getString("celular"));
+                u.setCorreo(rs.getString("correo")); // Nuevo
+                u.setPassword(rs.getString("password")); // Nuevo
                 u.setId_cargo(rs.getInt("id_cargo"));
             }
         } catch (Exception e) {
@@ -61,16 +88,18 @@ public class UsuarioDAO {
         return u;
     }
 
-    // METODO AGREGAR
+    // METODO AGREGAR (Actualizado: Ahora guarda correo y password)
     public boolean add(Usuario us) {
-        String sql = "INSERT INTO usuarios(nombre, apellido, celular, id_cargo) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO usuarios(nombre, apellido, celular, correo, password, id_cargo) VALUES(?,?,?,?,?,?)";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
             ps.setString(1, us.getNombre());
             ps.setString(2, us.getApellido());
             ps.setString(3, us.getCelular());
-            ps.setInt(4, us.getId_cargo());
+            ps.setString(4, us.getCorreo());    // Nuevo campo
+            ps.setString(5, us.getPassword());  // Nuevo campo
+            ps.setInt(6, us.getId_cargo());
             ps.executeUpdate();
             return true;
         } catch (Exception e) {
@@ -79,17 +108,19 @@ public class UsuarioDAO {
         }
     }
 
-    // METODO EDITAR
+    // METODO EDITAR (Actualizado: Ahora edita correo y password)
     public boolean edit(Usuario us) {
-        String sql = "UPDATE usuarios SET nombre=?, apellido=?, celular=?, id_cargo=? WHERE id_usuario=?";
+        String sql = "UPDATE usuarios SET nombre=?, apellido=?, celular=?, correo=?, password=?, id_cargo=? WHERE id_usuario=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
             ps.setString(1, us.getNombre());
             ps.setString(2, us.getApellido());
             ps.setString(3, us.getCelular());
-            ps.setInt(4, us.getId_cargo());
-            ps.setInt(5, us.getId()); // El ID va al final en el WHERE
+            ps.setString(4, us.getCorreo());    // Nuevo campo
+            ps.setString(5, us.getPassword());  // Nuevo campo
+            ps.setInt(6, us.getId_cargo());
+            ps.setInt(7, us.getId()); // El ID va al final
             ps.executeUpdate();
             return true;
         } catch (Exception e) {
@@ -98,7 +129,7 @@ public class UsuarioDAO {
         }
     }
 
-    // METODO ELIMINAR
+    // METODO ELIMINAR (No cambia)
     public boolean eliminar(int id) {
         String sql = "DELETE FROM usuarios WHERE id_usuario=" + id;
         try {
